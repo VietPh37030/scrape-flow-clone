@@ -3,6 +3,7 @@ import LanguageSwitcher from '@/components/LanguageSwitcher'
 import DestopSideBar from '@/components/SideBar'
 import { ModeToggle } from '@/components/ThemeModeToggle'
 import { Separator } from '@/components/ui/separator'
+import { SignIn, UserButton } from '@clerk/nextjs'
 import React from 'react'
 
 
@@ -15,7 +16,7 @@ function layout({children}: { children: React.ReactNode }) {
                    <BreadCrumbHeader />
                    <div className='gap-1 flex items-center'>
                     <ModeToggle />
-                    <LanguageSwitcher />
+                    <UserButton />
                    </div>
                 </header>
                 <Separator />

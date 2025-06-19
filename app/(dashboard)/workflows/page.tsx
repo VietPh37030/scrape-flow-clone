@@ -3,9 +3,10 @@
 import { Skeleton } from '@/components/ui/skeleton'
 import { waitFor } from '@/lib/helper/waitFor'
 import React, { Suspense } from 'react'
-import {AlertDescription,Alert,AlertTitle} from "@/components/ui/alert"
-import { AlertCircle } from 'lucide-react'
-import { getWorkflowsForUser } from '@/actions/workflow/getWorkflowsForUser'
+import { AlertDescription, Alert, AlertTitle } from "@/components/ui/alert"
+import { AlertCircle, InboxIcon } from 'lucide-react'
+import { GetWorkflowsForUser } from '@/actions/workflow/getWorkflowsForUser'
+import CreateWorkflowDialog from './_components/CreateWorkflowDialog'
 
 function page() {
   return (
@@ -19,6 +20,7 @@ function page() {
             Quản lý WorkFlows
           </p>
         </div>
+        <CreateWorkflowDialog/>
       </div>
       <div className="h-full py-6">
         <Suspense fallback={<UserWorkflowSkeleton />}>
@@ -42,18 +44,39 @@ function UserWorkflowSkeleton() {
 }
 
 async function UserWorkflows() {
-  await waitFor(3000)
-  const workflows = await getWorkflowsForUser();
+  const workflows = await GetWorkflowsForUser();
   if (!workflows) {
     return(
-       <Alert variant={"destructive"}>
-      <AlertCircle className='w-4 h-4'/>
-      <AlertTitle>Error</AlertTitle>
-       <AlertDescription>Something went wrong.Please try later</AlertDescription>
-    </Alert>
+      <Alert variant={"destructive"}>
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle className="text-lg">Không có Workflows</AlertTitle>
+        <AlertDescription>
+          Bạn chưa tạo Workflow nào. Hãy tạo một Workflow mới để bắt đầu.
+        </AlertDescription>
+      </Alert>
     )
   }
-  return(
+  if (workflows.length === 0) {
+    return(
+        <div className="flex flex-col gap-4 h-full 
+        items-center justify-center
+        ">
+          <div className="rounded-full bg-accent
+          w-20 h-20 flex items-center justify-center
+          ">
+            <InboxIcon className="stroke-primary" size={40}/>
+          </div>
+          <div className="flex flex-col text-center gap-1">
+            <p className="font-bold">Không có WorkFlows nào được tạo</p>
+            <p className="text-sm text-muted-foreground">Nhấn vào nút bên dưới để tạo luồng công việc đầu tiên của bạn.</p>
+          </div>
+          <CreateWorkflowDialog triggerText='Tạo WorkFlow mới'/>
+        </div>
+
+    )
+  }
+  
+  return (
     <div className="">
     </div>
   )

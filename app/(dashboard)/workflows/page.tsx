@@ -1,14 +1,14 @@
 "use client"
 
 import { Skeleton } from '@/components/ui/skeleton'
-import { waitFor } from '@/lib/helper/waitFor'
-import React, { Suspense } from 'react'
+import React from 'react'
 import { AlertDescription, Alert, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle, InboxIcon } from 'lucide-react'
-import { GetWorkflowsForUser } from '@/actions/workflow/getWorkflowsForUser'
 import CreateWorkflowDialog from './_components/CreateWorkflowDialog'
+import WorkflowCard from './_components/WorkflowCard'
+import { useWorkflows } from './_hooks/useWorkflows'
 
-function page() {
+function Page() {
   return (
     <div className='flex-1 flex flex-col h-full'>
       <div className="flex justify-between">
@@ -23,9 +23,7 @@ function page() {
         <CreateWorkflowDialog/>
       </div>
       <div className="h-full py-6">
-        <Suspense fallback={<UserWorkflowSkeleton />}>
-          <UserWorkflows />
-        </Suspense>
+        <UserWorkflows />
       </div>
     </div>
   )
@@ -43,20 +41,26 @@ function UserWorkflowSkeleton() {
   )
 }
 
-async function UserWorkflows() {
-  const workflows = await GetWorkflowsForUser();
-  if (!workflows) {
-    return(
+function UserWorkflows() {
+  const { data: workflows, isLoading, error } = useWorkflows();
+  
+  if (isLoading) {
+    return <UserWorkflowSkeleton />;
+  }
+  
+  if (error) {
+    return (
       <Alert variant={"destructive"}>
         <AlertCircle className="h-4 w-4" />
-        <AlertTitle className="text-lg">Không có Workflows</AlertTitle>
+        <AlertTitle className="text-lg">Lỗi</AlertTitle>
         <AlertDescription>
-          Bạn chưa tạo Workflow nào. Hãy tạo một Workflow mới để bắt đầu.
+          Không thể tải danh sách Workflows. Vui lòng thử lại sau.
         </AlertDescription>
       </Alert>
     )
   }
-  if (workflows.length === 0) {
+  
+  if (!workflows || workflows.length === 0) {
     return(
         <div className="flex flex-col gap-4 h-full 
         items-center justify-center
@@ -72,14 +76,16 @@ async function UserWorkflows() {
           </div>
           <CreateWorkflowDialog triggerText='Tạo WorkFlow mới'/>
         </div>
-
     )
   }
   
   return (
-    <div className="">
-    </div>
+   <div className="grid grid-cols-2 gap-4">
+    {workflows.map((workflow)=>(
+      <WorkflowCard key={workflow.id} workflow={workflow}/>
+    ))}
+   </div>
   )
 }
 
-export default page
+export default Page

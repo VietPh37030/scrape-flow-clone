@@ -11,26 +11,26 @@ import { Sheet, SheetContent, SheetTrigger } from './ui/sheet'
 
 const routers = [
     {
-        href: '',
+        href: '/',
         label: 'Trang Chủ',
         icon: HomeIcon,
 
     },
 
     {
-        href: 'workflows',
+        href: '/workflows',
         label: 'Workflow',
         icon: Layers2Icon,
 
     },
     {
-        href: 'credentials',
+        href: '/credentials',
         label: 'Xác Thực',
         icon: Fingerprint,
 
     },
     {
-        href: 'billing',
+        href: '/billing',
         label: 'Trả Phí',
         icon: BanknoteArrowDown,
 
@@ -39,7 +39,7 @@ const routers = [
 ]
 function DestopSideBar() {
     const pathname = usePathname();
-    const activeRoute = routers.find((route) => route.href.length >0 && pathname.includes(route.href) )|| routers[0];
+    const activeRoute = routers.find((route) => route.href !== '/' && pathname.includes(route.href) )|| routers[0];
     return (
         <div
             className='hidden relative md:block min-w-[280px] max-w-[280px] h-screen overflow-hidden w-full 
@@ -71,7 +71,7 @@ function DestopSideBar() {
 export function MobileSidebar(){
     const [isOpen, setOpen] = useState(false);
      const pathname = usePathname();
-    const activeRoute = routers.find((route) => route.href.length >0 && pathname.includes(route.href) )|| routers[0];
+    const activeRoute = routers.find((route) => route.href !== '/' && pathname.includes(route.href) )|| routers[0];
     return(
         <div className='block border-separate bg-background md:hidden'> 
            <nav className='container flex items-center justify-between px-8'>

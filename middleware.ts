@@ -1,18 +1,19 @@
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+import { authMiddleware } from '@clerk/nextjs/server'
 
-// Mở rộng danh sách các trang công khai để bao gồm tất cả các trang trong quá trình phát triển
-const isPublicRoute = createRouteMatcher([
+// Danh sách các trang công khai
+const publicRoutes = [
   '/sign-in(.*)',
-  '/sign-up(.*)',
-  '/',
-  '/workflows(.*)',
-  '/credentials(.*)',
-  '/billing(.*)'
-])
+  '/sign-up(.*)'
+]
 
-export default clerkMiddleware(async (auth, req) => {
-  if (!isPublicRoute(req)) {
-     auth().protect()
+export default authMiddleware({
+  publicRoutes,
+  afterAuth(auth, req) {
+    // Nếu người dùng chưa đăng nhập và đang truy cập trang không công khai, chuyển hướng họ đến trang đăng nhập
+    if (!auth.userId && !auth.isPublicRoute) {
+      const signInUrl = new URL('/sign-in', req.url)
+      return Response.redirect(signInUrl)
+    }
   }
 })
 

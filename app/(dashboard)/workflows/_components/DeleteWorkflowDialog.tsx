@@ -78,7 +78,7 @@ function DeleteWorkflowDialog({ open, setOpen, workflowName, workflowId }: Props
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel>
+                    <AlertDialogCancel onClick={()=> setConfirmText("")}>
                         Thoát
                     </AlertDialogCancel>
                     <AlertDialogAction

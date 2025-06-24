@@ -82,7 +82,7 @@ function UserWorkflows() {
   return (
    <div className="grid grid-cols-2 gap-4">
     {workflows.map((workflow)=>(
-      <WorkflowCard key={workflow.id} workflow={workflow}/>
+      <WorkflowCard key={workflow.id}  workflow={workflow}/>
     ))}
    </div>
   )

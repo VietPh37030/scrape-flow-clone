@@ -6,11 +6,12 @@ import { useQuery } from "@tanstack/react-query";
 type Workflow = {
   id: string;
   name: string;
-  description?: string;
+  description: string | null;
   status: string;
   userId: string;
-  createdAt: string;
-  updatedAt: string;
+  definition: string;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 export function useWorkflows() {
@@ -23,7 +24,11 @@ export function useWorkflows() {
           throw new Error('Failed to fetch workflows');
         }
         const data = await response.json();
-        return data.workflows;
+        return data.workflows.map((workflow: any) => ({
+          ...workflow,
+          createdAt: new Date(workflow.createdAt),
+          updatedAt: new Date(workflow.updatedAt)
+        }));
       } catch (error) {
         console.error('Error fetching workflows:', error);
         throw error;

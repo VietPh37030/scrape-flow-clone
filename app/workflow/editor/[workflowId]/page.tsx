@@ -20,6 +20,9 @@ import { auth } from '@clerk/nextjs/server';
     if (!workflowId) {
       return <div>Workflow không có</div>
     }
+    if (!workflow) {
+      return <div>Workflow not found</div>;
+    }
   return <Editor workflow={workflow} />
 }
 

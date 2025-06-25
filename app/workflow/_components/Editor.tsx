@@ -1,18 +1,22 @@
 "use client"
 import { Workflow } from '@/lib/generated/prisma'
 import React from 'react'
-import {ReactFlowProvider} from '@xyflow/react'
+import { ReactFlowProvider } from '@xyflow/react'
 import FlowEditor from './FlowEditor'
 import TopBar from '@/app/(dashboard)/workflows/_components/topbar/Topbar'
+import TaskMenu from '@/app/(dashboard)/workflows/_components/TaskMenu'
 
 
-function Editor({workflow}:{workflow:Workflow}) {
+function Editor({ workflow }: { workflow: Workflow }) {
   return <ReactFlowProvider>
-    <div className="flex flex-col overflow-hidden  h-full w-full ">
-      <TopBar workflowId={workflow.id} title='Workflow editor' subtitle={workflow.name}/>
-    <section className='flex h-full overflow-auto'>
+    <div className="flex flex-col overflow-hidden h-full w-full ">
+      <TopBar workflowId={workflow.id}
+        title='Workflow editor'
+        subtitle={workflow.name} />
+      <section className='flex h-full overflow-auto'>
+        <TaskMenu />
         <FlowEditor workflow={workflow} />
-    </section>
+      </section>
     </div>
   </ReactFlowProvider>
 }

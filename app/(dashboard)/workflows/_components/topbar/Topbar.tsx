@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 
 import React from 'react'
 import Savebtn from './Savebtn';
+import ExecuteBtn from './ExecuteBtn';
 interface Props{
     title:string,
     subtitle?:string,
@@ -36,6 +37,7 @@ function TopBar({title,subtitle,workflowId}:Props) {
             </div>
         </div>
         <div className="flex gap-1 flex-1 justify-end ">
+            <ExecuteBtn workflowId={workflowId}/>
             <Savebtn workflowId={workflowId}/>
         </div>
     </header>

@@ -14,4 +14,9 @@ export interface AppNode extends Node{
     param:TaskParam;
     value:string;
     updateNodeParamValue:(newValue:string)=>void;
+    disabled:boolean;
+}
+export type AppNodeMissingInput ={
+    nodeId:string;
+    input:string[];
 }

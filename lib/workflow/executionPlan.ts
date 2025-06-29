@@ -10,7 +10,7 @@ type FlowToExecutionPlanType = {
     executionPlan?: WorkflowExecutionPlan;
     error?: {
         type: FlowToExecutionPlanValidationError;
-        isvalidElement?: AppNodeMissingInput[];
+        invalidInputs?: AppNodeMissingInput[];
     }
 };
 export function FlowExecutionPlan(
@@ -101,7 +101,7 @@ export function FlowExecutionPlan(
             return {
                 error: {
                     type: FlowToExecutionPlanValidationError.INVALID_INPUTS,
-                    isvalidElement: inputWithErrors
+                    invalidInputs: inputWithErrors
                 }
             }
         }

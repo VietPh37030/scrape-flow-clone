@@ -6,9 +6,7 @@ import { CreateFlowNode } from '@/lib/workflow/createFlowNode';
 import { TaskType } from '@/types/task';
 import NodeComponent from '@/app/(dashboard)/workflows/_components/nodes/NodeComponent';
 import { AppNode } from '@/types/appNode';
-import { set } from 'date-fns';
-import DeletableEdges from '@/app/(dashboard)/workflows/_components/edges/DeletableEdges';
-import { log } from 'node:util';
+  import DeletableEdges from '@/app/(dashboard)/workflows/_components/edges/DeletableEdges';
 import { TaskRegistry } from '@/lib/workflow/task/registry';
 const nodeTypes = {
   FlowScrapeNode: NodeComponent,

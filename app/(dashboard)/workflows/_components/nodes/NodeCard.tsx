@@ -10,8 +10,8 @@ function NodeCard({children,nodeId,isSelected}:{
     isSelected:boolean
 }) {
     const {getNode,setCenter} = useReactFlow();
-    const {isValidInputs} = useFlowValidation();
-    const hasInvalidInputs = isValidInputs.some((node)=>node.nodeId === nodeId);
+    const {invalidInputs} = useFlowValidation();
+    const hasInvalidInputs = invalidInputs ? invalidInputs.some((node)=>node.nodeId === nodeId) : false;
   return (
     <div 
     onDoubleClick={()=>{

@@ -1,6 +1,6 @@
 // Import PrismaClient từ thư viện @prisma/client
-import { PrismaClient } from "./generated/prisma";
-
+import { PrismaClient } from "./generated/prisma/client";
+// import { PrismaClient } from "@prisma/client";
 // Tạo biến global để lưu trữ instance PrismaClient
 declare global {
   var prisma: PrismaClient | undefined;

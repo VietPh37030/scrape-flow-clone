@@ -7,6 +7,7 @@ import { auth } from "@clerk/nextjs/server";
 import { number } from "zod";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
+import { ExecuteWorkflow } from "@/lib/workflow/executeWorkflow";
 
 export async function RunWorkflow(
 form:{
@@ -73,5 +74,6 @@ flowDefinition?:string}
   if(!execution){
     throw new Error("workflow exeution not created")
   }
+  ExecuteWorkflow(execution.id); //Run this the background
   redirect(`/workflow/runs/${workflow.id}/${execution.id}`);
 }

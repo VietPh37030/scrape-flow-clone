@@ -97,7 +97,7 @@ export function FlowExecutionPlan(
         if (nextPhase.nodes.length > 0) {
             executionPlan.push(nextPhase);
         }
-        if(inputWithErrors.length > 0){
+        if (inputWithErrors.length > 0) {
             return {
                 error: {
                     type: FlowToExecutionPlanValidationError.INVALID_INPUTS,
@@ -168,16 +168,16 @@ function getInvalidInputs(node: AppNode, edges: Edge[], planned: Set<string>) {
     console.log(`Invalid inputs for ${node.data.type}:`, invalidInputs);
     return invalidInputs;
 }
-function getIncomers(node:AppNode,nodes:AppNode[],edges:Edge[]){
-if(!node.id){
-return[];
-}
-const incomersIds = new Set();
-edges.forEach(edge=>{
-    if(edge.target === node.id){
-        incomersIds.add(edge.source);
+function getIncomers(node: AppNode, nodes: AppNode[], edges: Edge[]) {
+    if (!node.id) {
+        return [];
     }
+    const incomersIds = new Set();
+    edges.forEach(edge => {
+        if (edge.target === node.id) {
+            incomersIds.add(edge.source);
+        }
 
-});
-return nodes.filter((n)=>incomersIds.has(n.id));
+    });
+    return nodes.filter((n) => incomersIds.has(n.id));
 }

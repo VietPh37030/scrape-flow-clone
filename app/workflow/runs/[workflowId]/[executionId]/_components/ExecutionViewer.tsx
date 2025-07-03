@@ -21,11 +21,11 @@ export default function ExecutionViewer(
         queryFn: () => GetWorkflowExecutionWithPhase(initialData!.id),
         refetchInterval: (q) => q.state.data?.status === WorkflowExecutionStatus.RUNNING ? 1000 : false,
     });
-     const [selectedPhase,setSelectedPhase] = useState<string |null>(null)
+    const [selectedPhase, setSelectedPhase] = useState<string | null>(null)
     const phaseDetails = useQuery({
-        queryKey :["phaseDetails",selectedPhase],
-        enabled:selectedPhase !== null,
-        queryFn: ()=>getWorkflowPhaseDetails(selectedPhase!),
+        queryKey: ["phaseDetails", selectedPhase],
+        enabled: selectedPhase !== null,
+        queryFn: () => getWorkflowPhaseDetails(selectedPhase!),
     })
     const isRunning = query.data?.status === WorkflowExecutionStatus.RUNNING
     const duration = DatesToDurationString(
@@ -34,7 +34,7 @@ export default function ExecutionViewer(
     )
 
     const creditsConsumer = GetPhaseTotalCost(query.data?.phases || []);
-   
+
     return (
 
         <div className='flex w-full h-full'>
@@ -74,14 +74,14 @@ export default function ExecutionViewer(
                 <Separator />
                 <div className="overflow-auto h-full px-2 py-4">
                     {query.data?.phases.map((phase, index) => (
-                        <Button 
-                         variant={selectedPhase === phase.id ? "secondary":"ghost"}
-                          key={phase.id}
-                          onClick={()=>{
-                            if(isRunning) return;
-                            setSelectedPhase(phase.id)
-                          }}
-                           className='w-full  justify-between'>
+                        <Button
+                            variant={selectedPhase === phase.id ? "secondary" : "ghost"}
+                            key={phase.id}
+                            onClick={() => {
+                                if (isRunning) return;
+                                setSelectedPhase(phase.id)
+                            }}
+                            className='w-full  justify-between'>
                             <div className='flex items-center gap-2'>
                                 <Badge variant={"outline"}>{index + 1}</Badge>
                                 <p className='font-semibold'>{phase.name}</p>
@@ -93,9 +93,54 @@ export default function ExecutionViewer(
                 </div>
             </aside>
             <div className="flex w-full h-full">
-                <pre>
-                    {JSON.stringify(phaseDetails.data,null,4)}
-                </pre>
+                {isRunning && (
+                    <div className="flex items-center flex-col gap-2 justify-center w-full h-full
+                    ">
+                        <p className="font-bold">Đang chạy, vui lòng đợi...</p>
+                    </div>
+                )}
+                {
+                    !isRunning && !selectedPhase &&(
+                      <div className="flex items-center flex-col gap-2 justify-center w-full h-full
+                    ">
+                        <div className='flex flex-col gap-1 text-center'>
+                            <p className="font-bold">Không có giai đoạn nào được chọn</p>
+                            <p className="text-sm text-muted-foreground">
+                                Chọn một giai đoạn để xem chi tiết
+                            </p>
+                        </div>
+                    </div>  
+                    )
+                }
+                {
+                 !isRunning && selectedPhase && phaseDetails.data &&(
+                    <div className="flex  flex-col py-4 container 
+                    gap-4 overflow-auto
+                    ">
+                        <div className="flex  gap-2 items-center">
+                        <Badge variant={"outline"} className='space-x-4'>
+                        <div className="flex gap-1 items-center">
+                            <CoinsIcon size={20} className='stroke-muted-foreground'/>
+                            <span>Tín Dụng</span>
+                        </div>
+                            <span>TODO</span>
+                        </Badge>
+                        <Badge variant={"outline"} className='space-x-4'>
+                        <div className="flex gap-1 items-center">
+                            <ClockIcon size={20} className='stroke-muted-foreground'/>
+                            <span>Thời lượng</span>
+                        </div>
+                            <span>{
+                                DatesToDurationString(phaseDetails.data.completedAt,
+                                    phaseDetails.data.startedAt
+                                ) || "-"
+                                
+                                }</span>
+                        </Badge>
+                        </div>
+                    </div>
+                 )
+                }
             </div>
         </div>
     )

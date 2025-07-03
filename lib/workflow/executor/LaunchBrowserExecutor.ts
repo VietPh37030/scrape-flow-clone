@@ -9,15 +9,15 @@ export async  function LaunchBrowserExecutor(
         const webisterUrl = enviroment.getInput("Website URL"); 
         console.log("@@WEBSITE URL",webisterUrl);
        const browser = await puppeteer.launch({
-        headless : false //For testing
+        headless : true //For testing
        });
        enviroment.setBrowser(browser);
        const page =  await browser. newPage();
        await page.goto(webisterUrl)
         enviroment.setPage(page);
        return true
-    } catch (error) {
-        console.error(error);
+    } catch (error:any) {
+       enviroment.log.error(error.message);
         return false
     }
 }

@@ -9,8 +9,8 @@ export async  function PageToHtmlExecutor(
         const html = await enviroment.getPage()!.content();
         enviroment.setOutput("Html",html)
        return true
-    } catch (error) {
-        console.error(error);
+    } catch (error:any) {
+      enviroment.log.error(error.message);
         return false
     }
 }

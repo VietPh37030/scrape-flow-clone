@@ -159,7 +159,7 @@ async function finalizePhase(phaseId: string, success: boolean, outputs: any,log
         },
         data: {
             status: finalStatus,
-            completedAt: new Date(),
+            completed: new Date(),
             outputs: JSON.stringify(outputs),
             logs:{
                 createMany:{

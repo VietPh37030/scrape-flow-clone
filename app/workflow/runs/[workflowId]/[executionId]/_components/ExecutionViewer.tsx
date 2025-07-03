@@ -131,7 +131,7 @@ export default function ExecutionViewer(
                             <span>Thời lượng</span>
                         </div>
                             <span>{
-                                DatesToDurationString(phaseDetails.data.completedAt,
+                                DatesToDurationString(phaseDetails.data.completed,
                                     phaseDetails.data.startedAt
                                 ) || "-"
                                 

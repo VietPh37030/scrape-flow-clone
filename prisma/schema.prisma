@@ -52,7 +52,7 @@ model ExecutionPhase {
   node                String
   name                String
   startedAt           DateTime?
-  completedAt           DateTime?
+  completed           DateTime?
   inputs              String?
   outputs             String?
   creditsConsumed     Int?

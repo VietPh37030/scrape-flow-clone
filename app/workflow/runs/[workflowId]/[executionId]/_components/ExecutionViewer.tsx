@@ -3,14 +3,21 @@ import { GetWorkflowExecutionWithPhase } from '@/actions/workflow/getWorkflowExe
 import { getWorkflowPhaseDetails } from '@/actions/workflow/getWorkflowPhaseDetails';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { ExecutionLog } from '@/lib/generated/prisma';
 import { DatesToDurationString } from '@/lib/helper/dates';
 import { GetPhaseTotalCost } from '@/lib/helper/phases';
-import { WorkflowExecutionStatus } from '@/types/workflow';
+import { cn } from '@/lib/utils';
+import { LogLevel, LogLevels } from '@/types/log';
+import { ExecutionPhaseStatus, WorkflowExecutionStatus } from '@/types/workflow';
 import { useQuery } from '@tanstack/react-query';
 import { formatDistanceToNow } from 'date-fns';
 import { Calendar1Icon, CircleDashedIcon, ClockIcon, CoinsIcon, Loader2Icon, LucideIcon, WorkflowIcon } from 'lucide-react';
-import React, { ReactNode, useState } from 'react'
+import React, { ReactNode, useEffect, useState } from 'react'
+import PhaseStatusBadge from './PhaseStatusBadge';
 type ExecutionData = Awaited<ReturnType<typeof GetWorkflowExecutionWithPhase>>
 export default function ExecutionViewer(
     { initialData }:
@@ -28,6 +35,22 @@ export default function ExecutionViewer(
         queryFn: () => getWorkflowPhaseDetails(selectedPhase!),
     })
     const isRunning = query.data?.status === WorkflowExecutionStatus.RUNNING
+    useEffect(() => {
+      // While runiing we auto-select  the current running phase in the sidebar
+      const phases = query.data?.phases || [];
+        if(isRunning){
+            const phaseToSelect= phases.toSorted((a,b)=>
+            a.startedAt! > b.startedAt! ? -1 :1
+            )[0];
+            setSelectedPhase(phaseToSelect.id);
+            return;
+        }
+         const phaseToSelect= phases.toSorted((a,b)=>
+            a.completed! > b.completed! ? -1 :1
+            )[0];
+       setSelectedPhase(phaseToSelect.id);
+    }, [query.data?.phases,isRunning,setSelectedPhase])
+    
     const duration = DatesToDurationString(
         query.data?.completedAt,
         query.data?.startedAt
@@ -86,7 +109,7 @@ export default function ExecutionViewer(
                                 <Badge variant={"outline"}>{index + 1}</Badge>
                                 <p className='font-semibold'>{phase.name}</p>
                             </div>
-                            <p className="text-xs text-muted-foreground">{phase.status}</p>
+                           <PhaseStatusBadge status={phase.status as ExecutionPhaseStatus}/>
                         </Button>
                     )
                     )}
@@ -100,46 +123,57 @@ export default function ExecutionViewer(
                     </div>
                 )}
                 {
-                    !isRunning && !selectedPhase &&(
-                      <div className="flex items-center flex-col gap-2 justify-center w-full h-full
+                    !isRunning && !selectedPhase && (
+                        <div className="flex items-center flex-col gap-2 justify-center w-full h-full
                     ">
-                        <div className='flex flex-col gap-1 text-center'>
-                            <p className="font-bold">Không có giai đoạn nào được chọn</p>
-                            <p className="text-sm text-muted-foreground">
-                                Chọn một giai đoạn để xem chi tiết
-                            </p>
+                            <div className='flex flex-col gap-1 text-center'>
+                                <p className="font-bold">Không có giai đoạn nào được chọn</p>
+                                <p className="text-sm text-muted-foreground">
+                                    Chọn một giai đoạn để xem chi tiết
+                                </p>
+                            </div>
                         </div>
-                    </div>  
                     )
                 }
                 {
-                 !isRunning && selectedPhase && phaseDetails.data &&(
-                    <div className="flex  flex-col py-4 container 
+                    !isRunning && selectedPhase && phaseDetails.data && (
+                        <div className="flex  flex-col py-4 container 
                     gap-4 overflow-auto
                     ">
-                        <div className="flex  gap-2 items-center">
-                        <Badge variant={"outline"} className='space-x-4'>
-                        <div className="flex gap-1 items-center">
-                            <CoinsIcon size={20} className='stroke-muted-foreground'/>
-                            <span>Tín Dụng</span>
+                            <div className="flex  gap-2 items-center">
+                                <Badge variant={"outline"} className='space-x-4'>
+                                    <div className="flex gap-1 items-center">
+                                        <CoinsIcon size={20} className='stroke-muted-foreground' />
+                                        <span>Tín Dụng</span>
+                                    </div>
+                                    <span>TODO</span>
+                                </Badge>
+                                <Badge variant={"outline"} className='space-x-4'>
+                                    <div className="flex gap-1 items-center">
+                                        <ClockIcon size={20} className='stroke-muted-foreground' />
+                                        <span>Thời lượng</span>
+                                    </div>
+                                    <span>{
+                                        DatesToDurationString(phaseDetails.data.completed,
+                                            phaseDetails.data.startedAt
+                                        ) || "-"
+
+                                    }</span>
+                                </Badge>
+                            </div>
+                            <ParamaterViewer
+                                title="Đầu Vào"
+                                subtitle="Các tham số đầu vào của giai đoạn này"
+                                paramsJson={phaseDetails.data.inputs}
+                            ></ParamaterViewer>
+                            <ParamaterViewer
+                                title="Đầu Ra"
+                                subtitle="Các tham số đầu ra của giai đoạn này"
+                                paramsJson={phaseDetails.data.outputs}
+                            ></ParamaterViewer>
+                            <LogViewer logs={phaseDetails.data.logs} />
                         </div>
-                            <span>TODO</span>
-                        </Badge>
-                        <Badge variant={"outline"} className='space-x-4'>
-                        <div className="flex gap-1 items-center">
-                            <ClockIcon size={20} className='stroke-muted-foreground'/>
-                            <span>Thời lượng</span>
-                        </div>
-                            <span>{
-                                DatesToDurationString(phaseDetails.data.completed,
-                                    phaseDetails.data.startedAt
-                                ) || "-"
-                                
-                                }</span>
-                        </Badge>
-                        </div>
-                    </div>
-                 )
+                    )
                 }
             </div>
         </div>
@@ -166,5 +200,90 @@ function ExecutionLabel({
             </div>
         </div>
 
+    )
+}
+function ParamaterViewer({ title, subtitle, paramsJson }:
+    {
+        title: string,
+        subtitle: string,
+        paramsJson: string | null,
+    }
+) {
+    const params = paramsJson ? JSON.parse(paramsJson) : undefined;
+    return (
+        <Card>
+            <CardHeader className=' rounded-lg rounded-b-none border-b
+            py-4 bg-gray-50 dark:bg-background
+            '>
+                <CardTitle className='text-base'>{title}</CardTitle>
+                <CardDescription className='text-muted-foreground text-sm'>{subtitle}</CardDescription>
+            </CardHeader>
+            <CardContent className='py-4 '>
+                <div className="flex flex-col gap-2">
+                    {(!params || Object.keys(params).length === 0) && (
+                        <p className='text-sm'>
+                            Không có tham số nào được cung cấp cho giai đoạn này.
+                        </p>
+                    )}
+                    {
+                        params && Object.entries(params).map(([key, value]) => (
+                            <div key={key} className="flex justify-between
+                      items-center space-y-1
+                      ">
+                                <p className="text-muted-foreground text-sm flex-1 basis-1/3">
+                                    {key}
+                                </p>
+                                <Input className='flex basis-2/3'
+                                    readOnly
+                                    value={value as string}
+                                />
+                            </div>
+                        ))
+                    }
+                </div>
+            </CardContent>
+        </Card>
+    )
+}
+function LogViewer({ logs }: { logs: ExecutionLog[] | undefined }) {
+    if (!logs || logs.length === 0) return null;
+    return (
+        <Card className='w-full'>
+            <CardHeader className='rounded-lg rounded-b-none border-b
+          py-4 bg-gray-50  dark:bg-background
+        '>
+                <CardTitle className='text-base'>lOGS</CardTitle>
+                <CardDescription className='text-muted-foreground text-sm'>
+                    Các log của giai đoạn này
+                </CardDescription>
+            </CardHeader>
+            <CardContent className='p-0'>
+                <Table>
+                    <TableHeader className='text-muted-foreground text-sm'>
+                        <TableRow>
+                            <TableHead>Thời gian</TableHead>
+                            <TableHead>Cấp độ</TableHead>
+                            <TableHead>Tin nhắn</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {logs.map((log) => (
+                            <TableRow key={log.id} className='text-muted-foreground'>
+                                <TableCell width={190} className='text-muted-foreground
+                                text-xs p-[2px] pl-4
+                                '>{log.timestamp.toISOString()}</TableCell>
+                                <TableCell width={80} className={cn("uppercase text-xs font-bold p-[3px] pl-4",
+                                    (log.logLevel as LogLevel) === "error" && "text-destructive",
+                                    (log.logLevel as LogLevel) === "info" && "text-primary",
+                                )}
+                                
+                                >{log.logLevel}</TableCell>
+                                <TableCell className='flex-1 px-[3px] pl-4 text-sm'>{log.message}</TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </CardContent>
+        </Card>
     )
 }

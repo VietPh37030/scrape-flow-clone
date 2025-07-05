@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { Button, buttonVariants } from './ui/button'
 import { usePathname } from 'next/navigation'
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet'
+import UserAvailableCreditsBadge from './UserAvailableCreditsBadge'
 
 
 const routers = [
@@ -48,7 +49,7 @@ function DestopSideBar() {
             <div className='flex items-center justify-center gap-2 border-b-[1px] border-separate p-4'>
                 <Logo/>
             </div>
-            <div className='p-2  italic'>TODO CREDITS</div>
+            <div className='p-2  italic'><UserAvailableCreditsBadge/></div>
             <div className='flex flex-col p-2'>
                 {
                     routers.map(router =>(

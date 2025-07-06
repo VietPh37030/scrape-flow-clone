@@ -84,6 +84,7 @@ export function MobileSidebar(){
                 </SheetTrigger>
                 <SheetContent className='w-[400px] sm:w-[540px] space-y-4' side={'left'}>
                     <Logo/>
+                    <UserAvailableCreditsBadge/>
                     <div className='flex flex-col gap-1'>
                         {
                     routers.map(router =>(

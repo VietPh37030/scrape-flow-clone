@@ -18,6 +18,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { Calendar1Icon, CircleDashedIcon, ClockIcon, CoinsIcon, Loader2Icon, LucideIcon, WorkflowIcon } from 'lucide-react';
 import React, { ReactNode, useEffect, useState } from 'react'
 import PhaseStatusBadge from './PhaseStatusBadge';
+import ReactCountUpWrapper from '@/components/ReactCountUpWrapper';
 type ExecutionData = Awaited<ReturnType<typeof GetWorkflowExecutionWithPhase>>
 export default function ExecutionViewer(
     { initialData }:
@@ -86,7 +87,7 @@ export default function ExecutionViewer(
                 ) : (
                     <Loader2Icon className='animate-spin' size={20} />
                 )} />
-                <ExecutionLabel icon={CoinsIcon} label="Đã dùng" value={creditsConsumer} />
+                <ExecutionLabel icon={CoinsIcon} label="Đã dùng" value={<ReactCountUpWrapper value={creditsConsumer}/>} />
                 <Separator />
                 <div className="flex justify-center items-center py-2 px-4">
                     <div className='flex text-muted-foreground items-center gap-2'>
@@ -146,7 +147,7 @@ export default function ExecutionViewer(
                                         <CoinsIcon size={20} className='stroke-muted-foreground' />
                                         <span>Tín Dụng</span>
                                     </div>
-                                    <span>TODO</span>
+                                    <span>{phaseDetails.data.creditsConsumed}</span>
                                 </Badge>
                                 <Badge variant={"outline"} className='space-x-4'>
                                     <div className="flex gap-1 items-center">

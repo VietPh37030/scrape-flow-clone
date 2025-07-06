@@ -34,24 +34,25 @@ export async function ExecuteWorkflow(
     await initializeWorkflowExecution(executionId, execution.workflowId);
     await initializePhaseStatus(execution)
     const edges = JSON.parse(execution.definition).edges as Edge[];
-   
-    //TODO:initialize workflow execution
-    //todo:initizlize phases status
+
+    
     let creditsConsumed = 0;
     let executionFailed = false;
     for (const phase of execution.phases) {
-       
+
         //TODO:execute phase
-        //TODO:credits consumed
-        const phaseExecution = await executeWorkflowPhase(phase, enviroment, edges);
+
+
+        const phaseExecution = await 
+        executeWorkflowPhase(phase, enviroment, edges,execution.userId);
+        creditsConsumed += phaseExecution.creditsConsumed;
         if (!phaseExecution.success) {
             executionFailed = true;
             break
         }
     }
     await finalizeWorkflowExecution(executionId, execution.workflowId, executionFailed, creditsConsumed);
-    //TODO:finalize execution
-    //TODO:clean up enviroment
+    // Revalidate the workflow runs page
     await cleanupEnviroment(enviroment);
     revalidatePath("workflow/runs");
 }
@@ -126,6 +127,7 @@ async function executeWorkflowPhase(
     phase: ExecutionPhase,
     enviroment: Enviroment,
     edges: Edge[],
+    userId: string
 ) {
     const logCollector = createLogCollector();
     const startedAt = new Date();
@@ -143,15 +145,26 @@ async function executeWorkflowPhase(
         }
     });
     const creditsRequired = TaskRegistry[node.data.type].credits;
-    console.log(`Executing  phase ${phase.name} with  ${creditsRequired} credits`);
-    //TODO:decrement user  balancer (with required  credits)
-    //Execution phasesimulation
-    const success = await executePhase(phase, node, enviroment,logCollector);
+    let success = await decrementCredits(userId, creditsRequired, logCollector);
+    const creditsConsumed = success ? creditsRequired : 0;
+
+    if (success) {
+        //We can  execute the phase if the credits are sufficient
+        success = await executePhase(phase, node, enviroment, logCollector);
+
+    }
+
     const outputs = enviroment.phases[node.id].outputs;
-    await finalizePhase(phase.id, success, outputs,logCollector);
-    return { success }
+    await finalizePhase(phase.id, success, outputs, logCollector, creditsConsumed);
+    return { success,creditsConsumed }
 }
-async function finalizePhase(phaseId: string, success: boolean, outputs: any,logCollector:LogCollector) {
+async function finalizePhase(
+    phaseId: string,
+    success: boolean,
+    outputs: any,
+    logCollector: LogCollector,
+    creditsConsumed: number)
+     {
     const finalStatus = success ? ExecutionPhaseStatus.COMPLETED : ExecutionPhaseStatus.FAILED;
     await prisma.executionPhase.update({
         where: {
@@ -161,12 +174,13 @@ async function finalizePhase(phaseId: string, success: boolean, outputs: any,log
             status: finalStatus,
             completed: new Date(),
             outputs: JSON.stringify(outputs),
-            logs:{
-                createMany:{
-                    data:logCollector.getAll().map(log =>({
-                        message:log.message,
-                        logLevel:log.level,
-                        timestamp:log.timestamp
+            creditsConsumed,
+            logs: {
+                createMany: {
+                    data: logCollector.getAll().map(log => ({
+                        message: log.message,
+                        logLevel: log.level,
+                        timestamp: log.timestamp
                     }))
                 }
             }
@@ -233,5 +247,20 @@ function createExecutionEnviroment(
 async function cleanupEnviroment(enviroment: Enviroment) {
     if (enviroment.browser) {
         await enviroment.browser.close().catch(err => console.error("cannot close browser"))
+    }
+}
+async function decrementCredits(userId: string, amount: number, logCollector: LogCollector) {
+    try {
+        await prisma.userBalance.update({
+            where: { userId, credits: { gte: amount } },
+            data: { credits: { decrement: amount } }
+
+        })
+        return true
+    } catch (error) {
+        console.error(error);
+        logCollector.error("Số dư không đủ");
+        return false
+
     }
 }

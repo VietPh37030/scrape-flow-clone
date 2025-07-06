@@ -66,7 +66,11 @@ export default function ExecutionViewer(
             border-r-2 border-separate flex flex-grow flex-col overflow-hidden
             '>
                 {/**status at lable */}
-                <ExecutionLabel icon={CircleDashedIcon} label="Trạng Thái" value={query.data?.status} />
+                <ExecutionLabel icon={CircleDashedIcon}
+                 label="Trạng Thái" value={<div className='capitalize font-semibold flex gap-2 items-center'>
+                    <PhaseStatusBadge status={query.data?.status as ExecutionPhaseStatus} />
+                    <span className='capitalize'>{query.data?.status}</span>
+                 </div>} />
 
                 {/**Start at lable */}
                 <ExecutionLabel

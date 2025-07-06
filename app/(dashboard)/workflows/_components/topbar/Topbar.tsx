@@ -8,13 +8,19 @@ import React from 'react'
 import Savebtn from './Savebtn';
 import ExecuteBtn from './ExecuteBtn';
 import NavigationTabs from './NavigationTabs';
+import PublishBtn from './PublishBtn';
+import UnpublishBtn from './UnpublishBtn';
+// import UnpublishBtn from './UnpublishBtn';
+
 interface Props {
     title: string,
     subtitle?: string,
     workflowId: string,
-    hiddenBtn?: boolean
+    hiddenBtn?: boolean,
+    isPublished?: boolean
 }
-function TopBar({ title, subtitle, workflowId, hiddenBtn = false }: Props) {
+
+function TopBar({ title, subtitle, workflowId, hiddenBtn = false, isPublished = false }: Props) {
     const router = useRouter();
     return (
         <header className='flex p-2 border-2 border-separate justify-between
@@ -43,7 +49,15 @@ function TopBar({ title, subtitle, workflowId, hiddenBtn = false }: Props) {
                 {hiddenBtn === false && (
                     <>
                         <ExecuteBtn workflowId={workflowId} />
-                        <Savebtn workflowId={workflowId} />
+                      {isPublished && <UnpublishBtn workflowId={workflowId} />}
+
+
+                        {!isPublished && (
+                            <>
+                                <Savebtn workflowId={workflowId} />
+                                <PublishBtn workflowId={workflowId} />
+                            </>
+                        )}
                     </>
                 )}
 

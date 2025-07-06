@@ -3,7 +3,7 @@ import { Workflow } from '@/lib/generated/prisma'
 import React, { useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { WorkflowStatus } from '@/types/workflow'
-import { FileTextIcon, MoreVerticalIcon, PlayIcon, ShuffleIcon, TrashIcon } from 'lucide-react'
+import { FileTextIcon, MoreVerticalIcon, NotepadTextDashedIcon, PlayIcon, RssIcon, ShuffleIcon, TrashIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
 import { Button, buttonVariants } from '@/components/ui/button'
@@ -11,23 +11,23 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import TooltipWrapper from '@/components/TooltipWrapper'
 import DeleteWorkflowDialog from './DeleteWorkflowDialog'
 const statusColors = {
-  [WorkflowStatus.DRAFT]: "bg-lime-400 text-white",
-  [WorkflowStatus.PUBLISHED]: "bg-blue-7 text-white"
+  [WorkflowStatus.DRAFT]: "bg-lime-400 text-black",
+  [WorkflowStatus.PUBLISHED]: "bg-emerald-600 text-white"
 }
 function WorkflowCard({ workflow }: { workflow: Workflow }) {
   const isDraft = workflow.status === WorkflowStatus.DRAFT
   return (
     <Card className='border border-separate shadow-sm rounded-lg overflow-hidden
-   hover:shadow-md dark:shadow-primary/35
+   hover:shadow-md dark:shadow-primary/35 
    '>
       <CardContent className='p-4 flex items-center justify-between h-[100px]'>
         <div className="flex items-center justify-end space-x-4">
           <div className={cn("w-10 h-10 rounded-full flex items-center justify-center", statusColors[workflow.status as WorkflowStatus])}>
             {
               isDraft ? (
-                <FileTextIcon className='h-5 w-5' />
+                <NotepadTextDashedIcon className='h-5 w-5' />
               ) : (
-                <PlayIcon className='h-5 w-5' />
+                <RssIcon className='h-5 w-5' />
               )
             }
           </div>

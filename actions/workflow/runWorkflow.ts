@@ -37,7 +37,9 @@ export async function RunWorkflow(
     if (!workflow.executionPlan) {
       throw new Error("no execution plan found in published workflow");
     }
-    executionPlan = JSON.parse(workflow.definition);
+    // executionPlan = JSON.parse(workflow.definition);
+
+    executionPlan = JSON.parse(workflow.executionPlan);
   } else {
     //Draft
     if (!flowDefinition) {

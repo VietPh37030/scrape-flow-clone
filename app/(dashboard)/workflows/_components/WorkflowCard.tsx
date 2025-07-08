@@ -10,6 +10,7 @@ import { Button, buttonVariants } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import TooltipWrapper from '@/components/TooltipWrapper'
 import DeleteWorkflowDialog from './DeleteWorkflowDialog'
+import RunBtn from './RunBtn'
 const statusColors = {
   [WorkflowStatus.DRAFT]: "bg-lime-400 text-black",
   [WorkflowStatus.PUBLISHED]: "bg-emerald-600 text-white"
@@ -50,6 +51,7 @@ function WorkflowCard({ workflow }: { workflow: Workflow }) {
           </div>
         </div>
         <div className="flex items-center space-x-2">
+          {!isDraft && <RunBtn workflowId ={workflow.id}/>}
           <Link
             href={`/workflow/editor/${workflow.id}`}
             className={cn(buttonVariants({
